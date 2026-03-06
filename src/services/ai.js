@@ -11,6 +11,17 @@ const normalizeSkills = (skills = "") =>
 
 export const aiService = {
   async generateSummary({ jobTitle, years, skills }) {
+    if (import.meta.env.VITE_API_BASE_URL) {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ai/summary`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobTitle, years, skills }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.summary) return data.summary;
+      }
+    }
     if (firebaseReady && firebaseFunctions) {
       const fn = httpsCallable(firebaseFunctions, "generateSummary");
       const res = await fn({ jobTitle, years, skills });
@@ -24,6 +35,17 @@ export const aiService = {
 
   async improveExperience(text = "") {
     if (!text.trim()) return "";
+    if (import.meta.env.VITE_API_BASE_URL) {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ai/improve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.improved) return data.improved;
+      }
+    }
     if (firebaseReady && firebaseFunctions) {
       const fn = httpsCallable(firebaseFunctions, "improveExperience");
       const res = await fn({ text });
@@ -41,6 +63,17 @@ export const aiService = {
   },
 
   async suggestSkills(role = "") {
+    if (import.meta.env.VITE_API_BASE_URL) {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ai/skills`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.skills?.length) return data.skills;
+      }
+    }
     if (firebaseReady && firebaseFunctions) {
       const fn = httpsCallable(firebaseFunctions, "suggestSkills");
       const res = await fn({ role });
@@ -60,6 +93,17 @@ export const aiService = {
   },
 
   async atsScore(resumeData) {
+    if (import.meta.env.VITE_API_BASE_URL) {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ai/ats`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resumeText: JSON.stringify(resumeData) }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.score) return data;
+      }
+    }
     if (firebaseReady && firebaseFunctions) {
       const fn = httpsCallable(firebaseFunctions, "atsScore");
       const res = await fn({ resumeText: JSON.stringify(resumeData) });
@@ -78,6 +122,20 @@ export const aiService = {
   },
 
   async jobMatch(resumeData, jobDescription) {
+    if (import.meta.env.VITE_API_BASE_URL) {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ai/job-match`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          resumeText: JSON.stringify(resumeData),
+          jobDescription,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.score) return data;
+      }
+    }
     if (firebaseReady && firebaseFunctions) {
       const fn = httpsCallable(firebaseFunctions, "jobMatch");
       const res = await fn({
@@ -105,6 +163,17 @@ export const aiService = {
   },
 
   async interviewQuestions(resumeData) {
+    if (import.meta.env.VITE_API_BASE_URL) {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ai/interview`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resumeText: JSON.stringify(resumeData) }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.questions?.length) return data.questions;
+      }
+    }
     if (firebaseReady && firebaseFunctions) {
       const fn = httpsCallable(firebaseFunctions, "interviewQuestions");
       const res = await fn({ resumeText: JSON.stringify(resumeData) });
@@ -119,6 +188,20 @@ export const aiService = {
     ];
   },
   async chatAssist(resumeData, prompt) {
+    if (import.meta.env.VITE_API_BASE_URL) {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ai/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          resumeText: JSON.stringify(resumeData),
+          prompt,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.response) return data.response;
+      }
+    }
     if (firebaseReady && firebaseFunctions) {
       const fn = httpsCallable(firebaseFunctions, "chatAssist");
       const res = await fn({

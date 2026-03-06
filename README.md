@@ -61,7 +61,27 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 VITE_FIREBASE_APP_ID=your_app_id
 
 VITE_OPENAI_API_KEY=your_openai_key
+VITE_API_BASE_URL=http://127.0.0.1:8081
 ```
+
+## Secure AI Server (Express)
+
+This project includes a secure backend in `server/` to call OpenAI without exposing keys.
+
+1. Create `server/.env`:
+   ```
+   OPENAI_API_KEY=your_openai_key
+   PORT=8081
+   ```
+2. Install deps:
+   ```
+   cd server
+   npm install
+   ```
+3. Start server:
+   ```
+   npm start
+   ```
 
 ## Firebase Functions (OpenAI)
 
