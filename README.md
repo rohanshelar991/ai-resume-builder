@@ -87,6 +87,11 @@ users/{uid}/resumes/{resumeId}
 ```
 The builder auto-saves every ~1.2s when logged in.
 
+Deploy Firestore rules:
+```
+firebase deploy --only firestore
+```
+
 ### Building for Production
 
 To create a production build:
