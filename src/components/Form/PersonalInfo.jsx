@@ -1,16 +1,10 @@
 import React, { useContext } from "react";
 import { ResumeContext } from "../../context/ResumeContext";
-import { Sparkles, User, Mail, Phone, Linkedin, Github, AlertCircle } from "lucide-react";
+import { User, Mail, Phone, Linkedin, Github, AlertCircle } from "lucide-react";
 import ProfilePhoto from "./ProfilePhoto";
 
 const InputField = ({ label, name, value, onChange, placeholder, icon: Icon, error, fieldType = 'default' }) => {
-  const { improveWithAI, loading } = useContext(ResumeContext);
   const inputId = `input-${name}`;
-
-  const handleImprove = async () => {
-    const improvedText = await improveWithAI(value, fieldType);
-    onChange({ target: { name, value: improvedText } });
-  };
 
   return (
     <div className="flex flex-col gap-2">
@@ -38,16 +32,6 @@ const InputField = ({ label, name, value, onChange, placeholder, icon: Icon, err
             <AlertCircle size={16} className="text-red-500" />
           </div>
         )}
-        <button
-          onClick={handleImprove}
-          disabled={loading || !value}
-          className="absolute top-1/2 right-2 -translate-y-1/2 flex items-center gap-1 text-xs sm:text-sm bg-blue-600/20 text-blue-400 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md hover:bg-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
-          aria-label={`Improve ${label} with AI`}
-        >
-          <Sparkles size={12} className="sm:block hidden" />
-          <span className="sm:hidden">AI</span>
-          <span className="hidden sm:block">Improve</span>
-        </button>
       </div>
       {error && (
         <p 

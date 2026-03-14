@@ -1,21 +1,16 @@
 import React, { useContext, useState } from "react";
 import { ResumeContext } from "../../context/ResumeContext";
-import { Sparkles, Wand2, Lightbulb, Wrench, AlertCircle } from "lucide-react";
+import { Wand2, Lightbulb, Wrench } from "lucide-react";
 import { aiService } from "../../services/ai";
 
 const Skills = () => {
-  const { resumeData, updateResumeData, improveWithAI, loading } =
+  const { resumeData, updateResumeData, loading } =
     useContext(ResumeContext);
   const { skills } = resumeData;
   const [jobTitle, setJobTitle] = useState("");
 
   const handleChange = (e) => {
     updateResumeData("skills", e.target.value);
-  };
-
-  const handleImprove = async () => {
-    const improvedSkills = await improveWithAI(skills, 'skills');
-    updateResumeData("skills", improvedSkills);
   };
 
   const handleSuggestSkills = async () => {
@@ -39,27 +34,15 @@ const Skills = () => {
         <p className="text-xs sm:text-sm text-muted-foreground">
           Enter your skills, separated by commas.
         </p>
-        <div className="relative">
-          <textarea
-            id="skills-textarea"
-            name="skills"
-            value={skills}
-            onChange={handleChange}
-            placeholder="e.g., JavaScript, React, Python, Figma..."
-            className="form-input h-32 sm:h-48 resize-none pr-24 sm:pr-28 text-sm sm:text-base"
-            aria-describedby="skills-help"
-          />
-          <button
-            onClick={handleImprove}
-            disabled={loading || !skills}
-            className="absolute top-2 right-2 flex items-center gap-1 text-xs sm:text-sm bg-blue-600/20 text-blue-400 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md hover:bg-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
-            aria-label="Improve skills with AI"
-          >
-            <Sparkles size={12} className="sm:block hidden" />
-            <span className="sm:hidden">AI</span>
-            <span className="hidden sm:block">Improve</span>
-          </button>
-        </div>
+        <textarea
+          id="skills-textarea"
+          name="skills"
+          value={skills}
+          onChange={handleChange}
+          placeholder="e.g., JavaScript, React, Python, Figma..."
+          className="form-input h-32 sm:h-48 resize-none text-sm sm:text-base"
+          aria-describedby="skills-help"
+        />
         <p id="skills-help" className="text-xs text-muted-foreground">
           Separate multiple skills with commas
         </p>

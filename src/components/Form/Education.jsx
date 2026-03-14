@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { ResumeContext } from "../../context/ResumeContext";
-import { Plus, Trash2, Sparkles, School, GraduationCap, Calendar, Trophy, AlertCircle } from "lucide-react";
+import { Plus, Trash2, School, GraduationCap, Calendar, Trophy, AlertCircle } from "lucide-react";
 
 const EducationField = ({
   label,
@@ -8,14 +8,11 @@ const EducationField = ({
   value,
   onChange,
   placeholder,
-  onImprove,
   icon: Icon,
   error,
-  fieldType = 'default',
   index,
   fieldIndex,
 }) => {
-  const { loading } = useContext(ResumeContext);
   const inputId = `education-${index}-${name}`;
 
   return (
@@ -44,18 +41,6 @@ const EducationField = ({
             <AlertCircle size={16} className="text-red-500" />
           </div>
         )}
-        {onImprove && (
-          <button
-            onClick={() => onImprove(fieldType)}
-            disabled={loading || !value}
-            className="absolute top-1/2 right-2 -translate-y-1/2 flex items-center gap-1 text-xs sm:text-sm bg-blue-600/20 text-blue-400 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md hover:bg-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
-            aria-label={`Improve ${label} with AI`}
-          >
-            <Sparkles size={12} className="sm:block hidden" />
-            <span className="sm:hidden">AI</span>
-            <span className="hidden sm:block">Improve</span>
-          </button>
-        )}
       </div>
       {error && (
         <p 
@@ -71,7 +56,7 @@ const EducationField = ({
 };
 
 const Education = () => {
-  const { resumeData, updateResumeData, addEntry, removeEntry, improveWithAI, errors } =
+  const { resumeData, updateResumeData, addEntry, removeEntry, errors } =
     useContext(ResumeContext);
   const { education } = resumeData;
 
@@ -79,13 +64,6 @@ const Education = () => {
     const { name, value } = e.target;
     const updatedEducation = [...education];
     updatedEducation[index][name] = value;
-    updateResumeData("education", updatedEducation);
-  };
-
-  const handleImprove = async (index, field, fieldType) => {
-    const improvedText = await improveWithAI(education[index][field], fieldType);
-    const updatedEducation = [...education];
-    updatedEducation[index][field] = improvedText;
     updateResumeData("education", updatedEducation);
   };
 
@@ -109,7 +87,6 @@ const Education = () => {
               onChange={(e) => handleChange(index, e)}
               placeholder="e.g., Harvard University"
               icon={School}
-              onImprove={(type) => handleImprove(index, 'school', 'school')}
               fieldType="school"
               index={index}
               fieldIndex={0}
@@ -121,7 +98,6 @@ const Education = () => {
               onChange={(e) => handleChange(index, e)}
               placeholder="e.g., B.S. in Computer Science"
               icon={GraduationCap}
-              onImprove={(type) => handleImprove(index, 'degree', 'degree')}
               fieldType="degree"
               index={index}
               fieldIndex={1}

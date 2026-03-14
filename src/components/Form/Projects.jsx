@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { ResumeContext } from "../../context/ResumeContext";
-import { Plus, Trash2, Sparkles, Code, Layers, Link, FileText, AlertCircle } from "lucide-react";
+import { Plus, Trash2, Code, Layers, Link, FileText, AlertCircle } from "lucide-react";
 
 const Projects = () => {
   const {
@@ -8,8 +8,7 @@ const Projects = () => {
     updateResumeData,
     addEntry,
     removeEntry,
-    improveWithAI,
-    loading,
+    // AI enhancements handled centrally now
     errors,
   } = useContext(ResumeContext);
   const { projects } = resumeData;
@@ -18,14 +17,6 @@ const Projects = () => {
     const { name, value } = e.target;
     const updatedProjects = [...projects];
     updatedProjects[index][name] = value;
-    updateResumeData("projects", updatedProjects);
-  };
-
-  const handleImprove = async (index, field, fieldType) => {
-    const textToImprove = projects[index][field];
-    const improvedText = await improveWithAI(textToImprove, fieldType);
-    const updatedProjects = [...projects];
-    updatedProjects[index][field] = improvedText;
     updateResumeData("projects", updatedProjects);
   };
 
@@ -47,7 +38,6 @@ const Projects = () => {
             value={project.name}
             onChange={(e) => handleChange(index, e)}
             placeholder="e.g., AI Resume Builder"
-            onImprove={(type) => handleImprove(index, 'name', 'name')}
             icon={Code}
             index={index}
             fieldIndex={0}
@@ -58,7 +48,6 @@ const Projects = () => {
             value={project.stack}
             onChange={(e) => handleChange(index, e)}
             placeholder="e.g., React, Tailwind CSS, Gemini"
-            onImprove={(type) => handleImprove(index, 'stack', 'skills')}
             icon={Layers}
             index={index}
             fieldIndex={1}
@@ -87,23 +76,13 @@ const Projects = () => {
               <textarea
                 id={`project-description-${index}`}
                 name="description"
-                value={project.description}
-                onChange={(e) => handleChange(index, e)}
-                placeholder="- A short description of your project...\n- What problems did it solve?"
-                className="form-input h-24 sm:h-32 resize-none pr-24 sm:pr-28 text-sm sm:text-base"
-                aria-describedby={errors[`projects-${index}-description`] ? `error-project-description-${index}` : undefined}
-                aria-invalid={errors[`projects-${index}-description`] ? 'true' : 'false'}
-              />
-              <button
-                onClick={() => handleImprove(index, 'description', 'projectDescription')}
-                disabled={loading || !project.description}
-                className="absolute top-2 right-2 flex items-center gap-1 text-xs sm:text-sm bg-blue-600/20 text-blue-400 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md hover:bg-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
-                aria-label="Improve project description with AI"
-              >
-                <Sparkles size={12} className="sm:block hidden" />
-                <span className="sm:hidden">AI</span>
-                <span className="hidden sm:block">Improve</span>
-              </button>
+              value={project.description}
+              onChange={(e) => handleChange(index, e)}
+              placeholder="- A short description of your project...\n- What problems did it solve?"
+              className="form-input h-24 sm:h-32 resize-none pr-24 sm:pr-28 text-sm sm:text-base"
+              aria-describedby={errors[`projects-${index}-description`] ? `error-project-description-${index}` : undefined}
+              aria-invalid={errors[`projects-${index}-description`] ? 'true' : 'false'}
+            />
             </div>
             {errors[`projects-${index}-description`] && (
               <p 
@@ -146,14 +125,11 @@ const InputField = ({
   value,
   onChange,
   placeholder,
-  onImprove,
   icon: Icon,
   error,
-  fieldType = 'default',
   index,
   fieldIndex,
 }) => {
-  const { loading } = useContext(ResumeContext);
   const inputId = `project-${index}-${name}`;
 
   return (
@@ -181,18 +157,6 @@ const InputField = ({
           <div className="absolute inset-y-0 right-24 sm:right-28 flex items-center pr-3">
             <AlertCircle size={16} className="text-red-500" />
           </div>
-        )}
-        {onImprove && (
-          <button
-            onClick={onImprove}
-            disabled={loading || !value}
-            className="absolute top-1/2 right-2 -translate-y-1/2 flex items-center gap-1 text-xs sm:text-sm bg-blue-600/20 text-blue-400 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md hover:bg-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
-            aria-label={`Improve ${label} with AI`}
-          >
-            <Sparkles size={12} className="sm:block hidden" />
-            <span className="sm:hidden">AI</span>
-            <span className="hidden sm:block">Improve</span>
-          </button>
         )}
       </div>
       {error && (

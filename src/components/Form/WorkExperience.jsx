@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { ResumeContext } from "../../context/ResumeContext";
-import { Plus, Trash2, Sparkles, Building, User, Calendar, FileText, AlertCircle } from "lucide-react";
+import { Plus, Trash2, Building, User, Calendar, FileText, AlertCircle } from "lucide-react";
 
 const WorkExperience = () => {
   const {
@@ -8,8 +8,7 @@ const WorkExperience = () => {
     updateResumeData,
     addEntry,
     removeEntry,
-    improveWithAI,
-    loading,
+    // AI enhancements handled centrally now
     errors,
   } = useContext(ResumeContext);
   const { workExperience } = resumeData;
@@ -18,14 +17,6 @@ const WorkExperience = () => {
     const { name, value } = e.target;
     const updatedWork = [...workExperience];
     updatedWork[index][name] = value;
-    updateResumeData("workExperience", updatedWork);
-  };
-
-  const handleImprove = async (index, field, fieldType) => {
-    const textToImprove = workExperience[index][field];
-    const improvedText = await improveWithAI(textToImprove, fieldType);
-    const updatedWork = [...workExperience];
-    updatedWork[index][field] = improvedText;
     updateResumeData("workExperience", updatedWork);
   };
 
@@ -48,7 +39,6 @@ const WorkExperience = () => {
               value={work.company}
               onChange={(e) => handleChange(index, e)}
               placeholder="e.g., Google"
-              onImprove={(type) => handleImprove(index, 'company', 'company')}
               icon={Building}
               error={errors[`workExperience-${index}-company`]}
               fieldType="company"
@@ -61,7 +51,6 @@ const WorkExperience = () => {
               value={work.role}
               onChange={(e) => handleChange(index, e)}
               placeholder="e.g., Software Engineer"
-              onImprove={(type) => handleImprove(index, 'role', 'role')}
               icon={User}
               error={errors[`workExperience-${index}-role`]}
               fieldType="role"
@@ -92,23 +81,13 @@ const WorkExperience = () => {
               <textarea
                 id={`work-description-${index}`}
                 name="description"
-                value={work.description}
-                onChange={(e) => handleChange(index, e)}
-                placeholder="- Bullet point 1...\n- Bullet point 2..."
-                className="form-input h-24 sm:h-36 resize-none pr-24 sm:pr-28 text-sm sm:text-base"
-                aria-describedby={errors[`workExperience-${index}-description`] ? `error-work-description-${index}` : undefined}
-                aria-invalid={errors[`workExperience-${index}-description`] ? 'true' : 'false'}
-              />
-              <button
-                onClick={() => handleImprove(index, 'description', 'workDescription')}
-                disabled={loading || !work.description}
-                className="absolute top-2 right-2 flex items-center gap-1 text-xs sm:text-sm bg-blue-600/20 text-blue-400 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md hover:bg-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
-                aria-label="Improve work description with AI"
-              >
-                <Sparkles size={12} className="sm:block hidden" />
-                <span className="sm:hidden">AI</span>
-                <span className="hidden sm:block">Improve</span>
-              </button>
+              value={work.description}
+              onChange={(e) => handleChange(index, e)}
+              placeholder="- Bullet point 1...\n- Bullet point 2..."
+              className="form-input h-24 sm:h-36 resize-none pr-24 sm:pr-28 text-sm sm:text-base"
+              aria-describedby={errors[`workExperience-${index}-description`] ? `error-work-description-${index}` : undefined}
+              aria-invalid={errors[`workExperience-${index}-description`] ? 'true' : 'false'}
+            />
             </div>
             {errors[`workExperience-${index}-description`] && (
               <p 
@@ -151,14 +130,11 @@ const InputField = ({
   value,
   onChange,
   placeholder,
-  onImprove,
   icon: Icon,
   error,
-  fieldType = 'default',
   index,
   fieldIndex,
 }) => {
-  const { loading } = useContext(ResumeContext);
   const inputId = `work-${index}-${name}`;
 
   return (
@@ -186,18 +162,6 @@ const InputField = ({
           <div className="absolute inset-y-0 right-24 sm:right-28 flex items-center pr-3">
             <AlertCircle size={16} className="text-red-500" />
           </div>
-        )}
-        {onImprove && (
-          <button
-            onClick={onImprove}
-            disabled={loading || !value}
-            className="absolute top-1/2 right-2 -translate-y-1/2 flex items-center gap-1 text-xs sm:text-sm bg-blue-600/20 text-blue-400 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md hover:bg-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
-            aria-label={`Improve ${label} with AI`}
-          >
-            <Sparkles size={12} className="sm:block hidden" />
-            <span className="sm:hidden">AI</span>
-            <span className="hidden sm:block">Improve</span>
-          </button>
         )}
       </div>
       {error && (

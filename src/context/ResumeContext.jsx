@@ -59,7 +59,8 @@ const enhanceWithAI = async (text, type) => {
       if (typeof text === "object" && text !== null) {
         return aiService.generateSummary(text);
       }
-      return aiService.generateSummary({ jobTitle: text, years: "", skills: "" });
+      // When users paste their own summary, rewrite it instead of inventing a new one.
+      return aiService.improveExperience(text);
     default:
       return text;
   }
