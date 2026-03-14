@@ -1,8 +1,6 @@
 import { httpsCallable } from "firebase/functions";
 import { firebaseFunctions, firebaseReady } from "./firebase";
 
-const randomPick = (items) => items[Math.floor(Math.random() * items.length)];
-
 const normalizeSkills = (skills = "") =>
   skills
     .split(",")
@@ -10,6 +8,39 @@ const normalizeSkills = (skills = "") =>
     .filter(Boolean);
 
 export const aiService = {
+  async generateResume(jobTitle = "") {
+    if (import.meta.env.VITE_API_BASE_URL) {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ai/resume`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobTitle }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.personalInfo) return data;
+      }
+    }
+    // Fallback minimal skeleton
+    return {
+      personalInfo: {
+        name: "",
+        email: "",
+        phone: "",
+        linkedin: "",
+        github: "",
+        title: jobTitle,
+        summary: "",
+      },
+      education: [{ school: "", degree: "", year: "", gpa: "" }],
+      workExperience: [{ company: "", role: "", duration: "", description: "" }],
+      projects: [{ name: "", description: "", stack: "", link: "" }],
+      skills: "",
+      certifications: [{ name: "", issuer: "", year: "" }],
+      languages: [{ name: "", level: "" }],
+      profilePhoto: "",
+    };
+  },
+
   async generateSummary({ jobTitle, years, skills }) {
     if (import.meta.env.VITE_API_BASE_URL) {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ai/summary`, {
@@ -51,15 +82,8 @@ export const aiService = {
       const res = await fn({ text });
       if (res?.data?.improved) return res.data.improved;
     }
-    const starters = [
-      "Developed scalable applications",
-      "Delivered mission-critical features",
-      "Optimized system performance",
-      "Led cross-functional initiatives",
-      "Implemented robust automation",
-    ];
-    const metrics = ["30%", "40%", "50%", "25%", "2x"];
-    return `${randomPick(starters)} using modern frameworks, improving system efficiency by ${randomPick(metrics)}.`;
+    // Fallback: keep the user's text instead of adding random content to avoid surprise changes.
+    return text.trim();
   },
 
   async suggestSkills(role = "") {

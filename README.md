@@ -61,7 +61,11 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 VITE_FIREBASE_APP_ID=your_app_id
 
 VITE_OPENAI_API_KEY=your_openai_key
-VITE_API_BASE_URL=http://127.0.0.1:8081
+VITE_API_BASE_URL=http://127.0.0.1:8081  # Express proxy URL; required for AI calls
+
+# Optional: switch providers/models used by the Express proxy
+# VITE_OPENAI_BASE_URL=https://api.openai.com/v1/chat/completions
+# VITE_OPENAI_MODEL=gpt-4o-mini
 ```
 
 ## Secure AI Server (Express)
@@ -71,6 +75,9 @@ This project includes a secure backend in `server/` to call OpenAI without expos
 1. Create `server/.env`:
    ```
    OPENAI_API_KEY=your_openai_key
+   # Optional: point to a compatible provider/model (e.g., OpenAI, Groq, etc.)
+   OPENAI_BASE_URL=https://api.openai.com/v1/chat/completions
+   OPENAI_MODEL=gpt-4o-mini
    PORT=8081
    ```
 2. Install deps:
@@ -125,6 +132,15 @@ To preview the production build locally:
 ```bash
 npm run preview
 ```
+
+## AI Endpoints (Express Proxy)
+
+- `POST /api/ai/summary`: Summarize a profile for the hero section.
+- `POST /api/ai/improve`: Improve an experience bullet.
+- `POST /api/ai/skills`: Suggest skills for a role.
+- `POST /api/ai/resume`: Generate a structured resume JSON for a given job title.
+
+> Keep real API keys out of version control. Use `.env.local` and `server/.env` locally; commit only the provided `.env.example` files.
 
 ## Project Structure
 

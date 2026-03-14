@@ -47,144 +47,22 @@ const validateGPA = (gpa) => {
 };
 
 // AI enhancement functions
+// Disable local "enhancements" that were adding random filler and stick to real AI.
 const enhanceWithAI = async (text, type) => {
-  // In a real implementation, this would call an actual AI API
-  // For now, we'll simulate more realistic enhancements
-  
-  // Simulate API delay
-  await new Promise((res) => setTimeout(res, 500 + Math.random() * 1000));
-  
   switch (type) {
-    case 'jobTitle':
-      return text;
-    case 'name':
-      return text;
-    case 'company':
-      return text;
-    case 'role':
-      return text;
-    case 'school':
-      return text;
-    case 'degree':
-      return text;
-    case 'workDescription':
+    case "workDescription":
+    case "experience":
       return aiService.improveExperience(text);
-    case 'projectDescription':
-      // Enhance project descriptions with technical details
-      const projectEnhancements = [
-        "Implemented using modern frameworks and best practices",
-        "Designed with scalability and performance in mind",
-        "Integrated with third-party APIs for enhanced functionality",
-        "Built with a focus on security and data protection",
-        "Utilized cloud services for reliable deployment and scaling",
-        "Followed agile methodologies for iterative development",
-        "Incorporated automated testing for quality assurance",
-        "Designed with responsive UI for cross-platform compatibility"
-      ];
-      const randomProjectEnhancement = projectEnhancements[Math.floor(Math.random() * projectEnhancements.length)];
-      return `- ${randomProjectEnhancement}\n- ${text.split('\n')[0]?.replace('-', '').trim() || 'Delivered core functionality as part of the development team'}`;
-    case 'skills':
-      // Enhance skills with related technologies
-      const skillEnhancements = [
-        "JavaScript, TypeScript, React, Vue.js, Angular",
-        "Python, Django, Flask, FastAPI, SQLAlchemy",
-        "Java, Spring Boot, Hibernate, Maven, Gradle",
-        "Node.js, Express, MongoDB, PostgreSQL, Redis",
-        "AWS, Docker, Kubernetes, Terraform, Jenkins",
-        "HTML, CSS, Sass, Tailwind CSS, Bootstrap",
-        "SQL, PostgreSQL, MySQL, MongoDB, Redis",
-        "Git, GitHub, GitLab, CI/CD, Agile, Scrum"
-      ];
-      const randomSkillEnhancement = skillEnhancements[Math.floor(Math.random() * skillEnhancements.length)];
-      return text ? `${text}, ${randomSkillEnhancement}` : randomSkillEnhancement;
-    case 'summary':
+    case "projectDescription":
+      return aiService.improveExperience(text);
+    case "summary":
       if (typeof text === "object" && text !== null) {
         return aiService.generateSummary(text);
       }
       return aiService.generateSummary({ jobTitle: text, years: "", skills: "" });
-    case 'experience':
-      return aiService.improveExperience(text);
     default:
-      return `${text} - enhanced by AI to be more professional and impactful.`;
+      return text;
   }
-};
-
-// AI resume generation
-const generateAIResume = async (jobTitle) => {
-  // Simulate API delay
-  await new Promise((res) => setTimeout(res, 1000 + Math.random() * 1000));
-  
-  // Generate more realistic resume data based on job title
-  const jobKeywords = jobTitle.toLowerCase();
-  let skills = "";
-  
-  if (jobKeywords.includes('frontend') || jobKeywords.includes('web')) {
-    skills = "React, JavaScript, HTML, CSS, TypeScript, Redux, Webpack, Jest, Git";
-  } else if (jobKeywords.includes('backend') || jobKeywords.includes('server')) {
-    skills = "Node.js, Python, Java, SQL, PostgreSQL, MongoDB, Docker, AWS, REST APIs";
-  } else if (jobKeywords.includes('data') || jobKeywords.includes('analyst')) {
-    skills = "Python, SQL, Pandas, NumPy, Tableau, Excel, Machine Learning, Statistics";
-  } else if (jobKeywords.includes('mobile')) {
-    skills = "React Native, Flutter, iOS, Android, Swift, Kotlin, Firebase, REST APIs";
-  } else {
-    skills = "JavaScript, Python, SQL, Git, REST APIs, Docker, AWS, Agile";
-  }
-  
-  return {
-    personalInfo: {
-      name: "Alex Johnson",
-      email: "alex.johnson@email.com",
-      phone: "+1 (555) 123-4567",
-      linkedin: "linkedin.com/in/alexjohnson",
-      github: "github.com/alexjohnson",
-      title: jobTitle,
-      summary: `Results-driven ${jobTitle} with a track record of delivering business impact and scalable solutions.`,
-    },
-    education: [
-      {
-        school: "University of Technology",
-        degree: jobKeywords.includes('data') ? "M.S. in Data Science" : 
-                jobKeywords.includes('computer') ? "B.S. in Computer Science" : 
-                "B.S. in Software Engineering",
-        year: "2022",
-        gpa: "3.8/4.0",
-      },
-    ],
-    workExperience: [
-      {
-        company: jobKeywords.includes('frontend') ? "WebTech Solutions" : 
-                 jobKeywords.includes('backend') ? "ServerStack Inc." : 
-                 jobKeywords.includes('data') ? "DataDriven Corp." : 
-                 "Tech Innovations Ltd.",
-        role: jobTitle,
-        duration: "2022 - Present",
-        description: `- Developed and maintained high-quality software solutions\n- Collaborated with cross-functional teams to deliver projects on time\n- Implemented best practices for code quality and performance`,
-      },
-    ],
-    projects: [
-      {
-        name: `${jobTitle.split(' ')[0]} Optimization Tool`,
-        description: `- A tool to improve productivity and workflow\n- Implemented using modern technologies and frameworks\n- Received positive feedback from users and stakeholders`,
-        stack: jobKeywords.includes('frontend') ? "React, Node.js, MongoDB" : 
-               jobKeywords.includes('backend') ? "Python, Django, PostgreSQL" : 
-               jobKeywords.includes('data') ? "Python, Pandas, Scikit-learn" : 
-               "JavaScript, React, Node.js",
-        link: "github.com/alexjohnson/project",
-      },
-    ],
-    skills: skills,
-    certifications: [
-      {
-        name: jobKeywords.includes('data') ? "Google Data Analytics" : "AWS Certified Cloud Practitioner",
-        issuer: jobKeywords.includes('data') ? "Google" : "Amazon",
-        year: "2023",
-      },
-    ],
-    languages: [
-      { name: "English", level: "Professional" },
-    ],
-    profilePhoto: "", // Initialize with empty profile photo
-  };
 };
 
 export const ResumeProvider = ({ children }) => {
@@ -205,11 +83,7 @@ export const ResumeProvider = ({ children }) => {
     };
   }, []);
 
-  const [resumeData, setResumeData] = useState(() => {
-    // Load from localStorage if available
-    const savedData = localStorage.getItem('resumeData');
-    return savedData ? normalizeResumeData(JSON.parse(savedData)) : initialResumeData;
-  });
+  const [resumeData, setResumeData] = useState(initialResumeData);
 
   const [resumeId] = useState(() => {
     return localStorage.getItem("resumeId") || "default";
@@ -227,10 +101,11 @@ export const ResumeProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // Save resume data to localStorage whenever it changes
+  // Always start clean; rely on Firestore (if available) for persistence.
   useEffect(() => {
-    localStorage.setItem('resumeData', JSON.stringify(resumeData));
-  }, [resumeData]);
+    setResumeData(initialResumeData);
+    setErrors({});
+  }, [user?.uid, resumeId]);
 
   // Load resume from Firestore when available
   useEffect(() => {
@@ -376,8 +251,8 @@ export const ResumeProvider = ({ children }) => {
   const generateAIResumeFunc = useCallback(async (jobTitle) => {
     setLoading(true);
     try {
-      const mockData = await generateAIResume(jobTitle);
-      setResumeData(mockData);
+      const aiData = await aiService.generateResume(jobTitle);
+      setResumeData(normalizeResumeData(aiData));
     } catch (error) {
       console.error("Error generating AI resume:", error);
     } finally {

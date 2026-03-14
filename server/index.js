@@ -6,6 +6,9 @@ import rateLimit from "express-rate-limit";
 const app = express();
 const PORT = process.env.PORT || 8081;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_BASE_URL =
+  process.env.OPENAI_BASE_URL || "https://api.groq.com/openai/v1/chat/completions";
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "llama-3.3-70b-versatile";
 
 app.use(cors({ origin: true }));
 app.use(express.json({ limit: "1mb" }));
@@ -21,14 +24,14 @@ const callOpenAI = async (messages, temperature = 0.5) => {
     return { error: "OPENAI_API_KEY is not set on the server." };
   }
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+  const response = await fetch(OPENAI_BASE_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
-      model: "gpt-4o-mini",
+      model: OPENAI_MODEL,
       temperature,
       messages,
     }),
@@ -159,6 +162,35 @@ app.post("/api/ai/chat", async (req, res) => {
   );
   if (result.error) return res.status(500).json({ error: result.error });
   res.json({ response: result.content });
+});
+
+app.post("/api/ai/resume", async (req, res) => {
+  const { jobTitle = "Software Engineer" } = req.body || {};
+  const result = await callOpenAI(
+    [
+      {
+        role: "system",
+        content:
+          "You are a resume builder. Return strict JSON only, no prose. Shape:\n{\n  \"personalInfo\": {\"name\":\"\",\"email\":\"\",\"phone\":\"\",\"linkedin\":\"\",\"github\":\"\",\"title\":\"\",\"summary\":\"\"},\n  \"education\": [{\"school\":\"\",\"degree\":\"\",\"year\":\"\",\"gpa\":\"\"}],\n  \"workExperience\": [{\"company\":\"\",\"role\":\"\",\"duration\":\"\",\"description\":\"\"}],\n  \"projects\": [{\"name\":\"\",\"description\":\"\",\"stack\":\"\",\"link\":\"\"}],\n  \"skills\": \"comma separated skills\",\n  \"certifications\": [{\"name\":\"\",\"issuer\":\"\",\"year\":\"\"}],\n  \"languages\": [{\"name\":\"\",\"level\":\"\"}]\n}\nFill values concisely and realistically for the role.",
+      },
+      {
+        role: "user",
+        content: `Role: ${jobTitle}`,
+      },
+    ],
+    0.4,
+  );
+  if (result.error) return res.status(500).json({ error: result.error });
+  try {
+    const cleaned =
+      result.content?.replace(/^```(?:json)?\s*/i, "").replace(/```$/, "") || "";
+    const json = JSON.parse(cleaned);
+    return res.json(json);
+  } catch (e) {
+    return res
+      .status(500)
+      .json({ error: "Failed to parse AI response", raw: result.content });
+  }
 });
 
 app.post("/api/ai/interview", async (req, res) => {
